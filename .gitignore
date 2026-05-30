@@ -1,0 +1,12 @@
+# Environment variables
+.env
+
+# Editor settings
+.vscode/
+
+# Dependencies
+node_modules/
+
+# Images / assets
+ChatGPT Image May 30, 2026, 12_14_24 PM.png
+*.png
