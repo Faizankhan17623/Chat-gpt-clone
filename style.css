@@ -1,0 +1,13 @@
+body {
+    background-color: #ffffff;
+}
+
+/* smooth fade + slide-up for chat bubbles */
+@keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.bubble-in {
+    animation: bubbleIn 0.35s ease-out;
+}
