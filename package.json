@@ -4,6 +4,7 @@
   "main": "Script.js",
   "type": "commonjs",
   "scripts": {
+    "start": "node Script.js",
     "dev": "nodemon Script.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
