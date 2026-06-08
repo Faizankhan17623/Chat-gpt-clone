@@ -1,5 +1,7 @@
-# Environment variables
+# Environment variables (keep secrets out of git)
 .env
+.env.*
+!.env.example
 
 # Editor settings
 .vscode/
@@ -7,6 +9,13 @@
 # Dependencies
 node_modules/
 
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
 # Images / assets
-ChatGPT Image May 30, 2026, 12_14_24 PM.png
 *.png
