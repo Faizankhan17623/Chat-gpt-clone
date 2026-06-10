@@ -26,7 +26,7 @@ const tvyl = tavily({apiKey:process.env.TAVILY_API_KEY})
 // Temp memory: stdTTL is in seconds. The conversation clears itself after a day.
 const cache = new NodeCache( { stdTTL: 1 * 24 * 60 * 60  } );
 
-async function main(question){
+async function main(question, sessionId){
       try {
 
             // const question = await rl.question('You: ')
@@ -35,14 +35,18 @@ async function main(question){
             //     break;
             // }
 
+            // Each browser session gets its OWN cache key, so two visitors
+            // (or a new visit in a fresh tab) never share a conversation.
+            const cacheKey = `chatHistory:${sessionId}`
+
             if (question === "/clear"){
-                cache.del("chatHistory")   // wipe the conversation memory
+                cache.del(cacheKey)   // wipe this session's conversation memory
                 return "Chat cleared."
             }
 
         // 1) Load the conversation from cache (temp memory).
         //    If nothing is saved yet, start with just the system prompt.
-        const message = cache.get("chatHistory") || [
+        const message = cache.get(cacheKey) || [
             {
                 role:"system",
                 content:`You are a friendly, helpful AI assistant.
@@ -128,7 +132,7 @@ USING THE WebSearch TOOL:
             console.log("AI:", finalAnswer)
 
             // 3) Save the updated conversation back to cache for the next turn.
-            cache.set("chatHistory", message)
+            cache.set(cacheKey, message)
 
             return finalAnswer
         }
@@ -162,12 +166,14 @@ async function WebSearch({ query }){
 app.post("/chat", async (req, res) => {
     try {
         const question = req.body.question
+        // Fall back to "default" so old clients without an ID still work.
+        const sessionId = req.body.sessionId || "default"
 
         if (!question) {
             return res.status(400).json({ error: "Question is required." })
         }
 
-        const answer = await main(question)
+        const answer = await main(question, sessionId)
         return res.status(200).json({ answer })
     } catch (error) {
         console.log(error.message)

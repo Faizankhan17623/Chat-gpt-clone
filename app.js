@@ -25,8 +25,19 @@ const recentsList    = document.querySelector("#recentsList");    // container f
 const suggestiosn = document.querySelector('.suggestion_btns') // suggestion btns
 const inputbox = document.querySelector('#inDiv')
 
-// All messages so far. localStorage only holds strings, so we JSON-convert.
-let history = JSON.parse(localStorage.getItem("chatHistory")) || []
+// A random ID for THIS browser tab/session. The server uses it to keep
+// each visitor's conversation separate. sessionStorage dies when the tab
+// closes, so a fresh visit = a fresh ID = an empty chat.
+let sessionId = sessionStorage.getItem("sessionId")
+if (!sessionId) {
+    sessionId = crypto.randomUUID()
+    sessionStorage.setItem("sessionId", sessionId)
+}
+
+// All messages so far. sessionStorage only holds strings, so we JSON-convert.
+// (sessionStorage, not localStorage: it clears when the tab closes, so the
+// chat survives a refresh but a brand-new visit starts with an empty screen.)
+let history = JSON.parse(sessionStorage.getItem("chatHistory")) || []
 
 // Draws ONE bubble on screen (does NOT touch storage).
 // sender: "user" -> right grey bubble | "ai" -> left bubble
@@ -51,10 +62,10 @@ function addBubble(text, sender) {
     saveToHistory(text, sender)
 }
 
-// Saves one message to localStorage (so it survives a refresh).
+// Saves one message to sessionStorage (so it survives a refresh).
 function saveToHistory(text, sender) {
     history.push({ text, sender })
-    localStorage.setItem("chatHistory", JSON.stringify(history))
+    sessionStorage.setItem("chatHistory", JSON.stringify(history))
 }
 
 // Like an empty AI bubble that types the text out word-by-word (ChatGPT style).
@@ -110,7 +121,7 @@ chatInput.addEventListener('keydown', async (e) => {
         const res = await fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question })
+            body: JSON.stringify({ question, sessionId })   // sessionId keeps each visitor's memory separate
         })
 
         const data = await res.json()
