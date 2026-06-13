@@ -128,7 +128,10 @@ USING THE WebSearch TOOL:
             continue
         } else {
             // Final text answer -> save history, then return it to the caller.
-            const finalAnswer = (responseMessage.content || "").replace(/[*#]/g, "")
+            const finalAnswer = (responseMessage.content || "")
+                .replace(/[*#]/g, "")
+                .replace(/\(function=\w+>[\s\S]*?<\/function\)/g, "")
+                .trim()
             console.log("AI:", finalAnswer)
 
             // 3) Save the updated conversation back to cache for the next turn.
