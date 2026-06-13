@@ -132,7 +132,7 @@ USING THE WebSearch TOOL:
                 .replace(/[*#]/g, "")
                 .replace(/\(function=\w+>[\s\S]*?<\/function\)/g, "")
                 .trim()
-            console.log("AI:", finalAnswer)
+
 
             // 3) Save the updated conversation back to cache for the next turn.
             cache.set(cacheKey, message)
@@ -150,7 +150,7 @@ USING THE WebSearch TOOL:
 
 async function WebSearch({ query }){   
     try {
-        console.log('..Web Search') 
+
         const response = await tvyl.search(query)
         const finalResult = response.results.map((result) => result.content).join('\n\n').replace(/[*#]/g, "");
         return finalResult || "No results found."
